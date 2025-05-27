@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Edit, Trash2, Eye } from "lucide-react";
+import { Edit, Trash2, Eye, X, Calendar } from "lucide-react";
 import AssetViewModal from "./AssetViewModal";
 import AddAssetForm from "./AddAssetForm"; // adjust path if in different directory
+import AssetAddModal from "./AssetAddModal";
 
 const ACTION_BTNS = [
   { label: "Add", className: "bg-red-500 text-white hover:bg-red-600" },
@@ -60,7 +61,16 @@ export default function AssetList() {
   const [modalOpen1, setModalOpen1] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const itemsPerPage = 10;
+
+  const handleAddClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
   useEffect(() => setCurrentPage(1), [searchTerm]);
 
@@ -89,13 +99,14 @@ export default function AssetList() {
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           <div className="flex flex-wrap gap-3">
             {ACTION_BTNS.map((btn) => (
-              <button
-                key={btn.label}
-                className={`border border-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-50 transition-colors ${btn.className || ""}`}
-              >
-                {btn.label}
-              </button>
-            ))}
+          <button
+            key={btn.label}
+            onClick={btn.label === "Add" ? handleAddClick : undefined}
+            className={`border border-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-50 transition-colors ${btn.className || ""}`}
+          >
+            {btn.label}
+          </button>
+        ))}
           </div>
           <div className="flex items-center gap-2">
             <label htmlFor="search" className="text-gray-700">
@@ -250,6 +261,13 @@ export default function AssetList() {
         asset={selectedAsset}
       />
       <AddAssetForm isOpen={modalOpen1} onClose={() => setModalOpen1(false)} />
+        {/* Asset Modal */}
+      <AssetAddModal 
+        isOpen={isModalOpen} 
+        onClose={closeModal} 
+      />
+
+      
     </div>
   );
 }

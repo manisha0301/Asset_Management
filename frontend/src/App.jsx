@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import Sidebar from './Sidebar';
 import MainContent from './MainContent';
 import AssetList from './AssetList';
+import AssetSubCategories from './AssetSubCategories';
+import AssetRequestList from './AssetRequestList';
 
 export default function App() {
   const [sidebarVisible, setSidebarVisible] = useState(true);
@@ -10,6 +12,11 @@ export default function App() {
   const renderMainContent = () => {
     if (currentPage === 'asset') {
       return <AssetList />;
+    } else if (currentPage === 'asset-sub-categories') {
+      return <AssetSubCategories />;  
+    }
+    else if (currentPage === 'asset-request') {
+      return <AssetRequestList />;  
     }
     return (
       <MainContent 

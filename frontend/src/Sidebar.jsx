@@ -55,7 +55,7 @@ export default function Sidebar({ sidebarVisible, currentPage, setCurrentPage })
               Asset
             </button>
           </li>
-          <li>
+          {/* <li>
             <a href="#" className="flex items-center px-4 py-3 text-gray-300 hover:text-white hover:bg-slate-700">
               <div className="w-5 h-5 mr-3">
                 <svg viewBox="0 0 24 24" fill="currentColor">
@@ -64,18 +64,25 @@ export default function Sidebar({ sidebarVisible, currentPage, setCurrentPage })
               </div>
               Asset History
             </a>
-          </li>
+          </li> */}
           <li>
-            <a href="#" className="flex items-center px-4 py-3 text-gray-300 hover:text-white hover:bg-slate-700">
+            <button 
+              onClick={() => setCurrentPage('asset-sub-categories')}
+              className={`flex items-center px-4 py-3 w-full text-left ${
+                currentPage === 'asset-sub-categories' 
+                  ? 'text-blue-400 bg-slate-700' 
+                  : 'text-gray-300 hover:text-white hover:bg-slate-700'
+              }`}
+            >
               <div className="w-5 h-5 mr-3">
                 <svg viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                 </svg>
               </div>
               Asset Sub Categories
-            </a>
+            </button>
           </li>
-          <li>
+          {/* <li>
             <a href="#" className="flex items-center px-4 py-3 text-gray-300 hover:text-white hover:bg-slate-700">
               <div className="w-5 h-5 mr-3">
                 <svg viewBox="0 0 24 24" fill="currentColor">
@@ -84,8 +91,8 @@ export default function Sidebar({ sidebarVisible, currentPage, setCurrentPage })
               </div>
               Asset Status
             </a>
-          </li>
-          <li>
+          </li> */}
+          {/* <li>
             <div className="px-4 py-3">
               <div 
                 className="flex items-center justify-between text-gray-300 hover:text-white cursor-pointer"
@@ -111,7 +118,7 @@ export default function Sidebar({ sidebarVisible, currentPage, setCurrentPage })
                 </div>
               )}
             </div>
-          </li>
+          </li> */}
           <li>
             <div className="px-4 py-3">
               <div 
@@ -130,6 +137,19 @@ export default function Sidebar({ sidebarVisible, currentPage, setCurrentPage })
               </div>
               {requestModuleOpen && (
                 <div className="mt-2 ml-8 space-y-1">
+                  <button 
+                    onClick={() => setCurrentPage('asset-request')}
+                    className={`block px-4 py-2 w-full text-left rounded ${
+                      currentPage === 'asset-request'
+                        ? 'text-blue-400 bg-slate-600'
+                        : 'text-gray-400 hover:text-white hover:bg-slate-700'
+                    }`}
+                  >
+                    Asset Request
+                  </button>
+                  <a href="#" className="block px-4 py-2 text-gray-400 hover:text-white hover:bg-slate-700 rounded">
+                    Asset Issue
+                  </a>
                   <a href="#" className="block px-4 py-2 text-gray-400 hover:text-white hover:bg-slate-700 rounded">
                     Manage Supplier
                   </a>
