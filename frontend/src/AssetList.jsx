@@ -128,7 +128,7 @@ export default function AssetList() {
               >
                 Add
               </button>
-              <div className="flex items-center space-x-2">
+              {/* <div className="flex items-center space-x-2">
                 <button className="flex items-center space-x-1 px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50">
                   <Copy className="w-4 h-4" />
                   <span>Copy</span>
@@ -149,7 +149,7 @@ export default function AssetList() {
                   <Printer className="w-4 h-4" />
                   <span>Print</span>
                 </button>
-              </div>
+              </div> */}
             </div>
             <div className="flex items-center">
               <label htmlFor="search" className="text-sm text-gray-600 mr-2">

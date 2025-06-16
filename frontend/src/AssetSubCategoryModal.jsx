@@ -66,8 +66,8 @@ const AssetSubCategoryModal = ({ isOpen, onClose, onSave }) => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
                 >
                   <option value="">Select a category</option>
-                  <option value="electronics">Electronics</option>
-                  <option value="non-electronics">Non-Electronics</option>
+                  <option value="Electronics">Electronics</option>
+                  <option value="Non-Electronics">Non-Electronics</option>
                 </select>
                 <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

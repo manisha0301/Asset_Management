@@ -16,29 +16,36 @@ export default function AssetSubCategories() {
   };
 
   const handleSaveSubCategory = (formData) => {
-    // Add the new sub category to your list or send to API
-    console.log('Saving sub category:', formData);
-    setSubCategories(prev => [...prev, { ...formData, id: Date.now() }]);
+    // Add the new sub category to the state
+    setSubCategories(prev => [...prev, { 
+      id: Date.now(), 
+      assetCategory: formData.category, 
+      subCategory: formData.subCategoryName, 
+      description: formData.description 
+    }]);
     setIsModalOpen(false);
   };
-  
+
   const assetSubCategories = [
     {
       id: 1,
-      assetCategory: 'IT',
+      assetCategory: 'Electronics',
       subCategory: 'Laptop Charger Lenovo',
       description: 'Laptop Charger Lenovo Pvt Ltd.'
     },
     {
       id: 2,
-      assetCategory: 'Furniture',
+      assetCategory: 'Non-Electronics',
       subCategory: 'Computer Desk',
       description: 'Computer Desk Nilkamal'
     }
   ];
 
+  // Combine static and dynamic sub-categories
+  const allCategories = [...assetSubCategories, ...subCategories];
 
-  const filteredCategories = assetSubCategories.filter(item =>
+  // Filter combined categories
+  const filteredCategories = allCategories.filter(item =>
     item.assetCategory.toLowerCase().includes(searchTerm.toLowerCase()) ||
     item.subCategory.toLowerCase().includes(searchTerm.toLowerCase()) ||
     item.description.toLowerCase().includes(searchTerm.toLowerCase())
@@ -64,32 +71,11 @@ export default function AssetSubCategories() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <button 
-              onClick={handleOpenModal}
-              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium">
+                onClick={handleOpenModal}
+                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium"
+              >
                 Add
               </button>
-              <div className="flex items-center space-x-2">
-                <button className="flex items-center space-x-1 px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50">
-                  <Copy className="w-4 h-4" />
-                  <span>Copy</span>
-                </button>
-                <button className="flex items-center space-x-1 px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50">
-                  <FileText className="w-4 h-4" />
-                  <span>Excel</span>
-                </button>
-                <button className="flex items-center space-x-1 px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50">
-                  <FileText className="w-4 h-4" />
-                  <span>CSV</span>
-                </button>
-                <button className="flex items-center space-x-1 px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50">
-                  <Download className="w-4 h-4" />
-                  <span>PDF</span>
-                </button>
-                <button className="flex items-center space-x-1 px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50">
-                  <Printer className="w-4 h-4" />
-                  <span>Print</span>
-                </button>
-              </div>
             </div>
             <div className="flex items-center">
               <label htmlFor="search" className="text-sm text-gray-600 mr-2">Search:</label>
@@ -175,7 +161,6 @@ export default function AssetSubCategories() {
                 </tr>
               ))}
             </tbody>
-            
           </table>
         </div>
 
@@ -183,7 +168,7 @@ export default function AssetSubCategories() {
         <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
           <div className="flex items-center justify-between">
             <div className="text-sm text-gray-700">
-              Showing 1 to 1 of 1 entries
+              Showing 1 to {filteredCategories.length} of {allCategories.length} entries
             </div>
             <div className="flex items-center space-x-2">
               <button 

@@ -14,8 +14,8 @@ export default function Sidebar({
   return (
     <div
       className={`${
-        sidebarVisible ? "w-64 " : "w-0"
-      } bg-slate-800 text-white transition-all duration-300 ease-in-out overflow-y-auto`}
+        sidebarVisible ? "w-64" : "w-0"
+      } bg-slate-800 text-white transition-all duration-300 h-screen fixed ease-in-out overflow-y-auto`}
     >
       {/* Logo */}
       <div className="p-4 border-b border-slate-700">

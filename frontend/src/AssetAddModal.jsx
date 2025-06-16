@@ -107,7 +107,7 @@ const AssetAddModal = ({ isOpen, onClose, onAddAsset, assetToEdit }) => {
       <input
         {...props}
         onChange={handleInputChange}
-        className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+        className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent file:mr-4 file:py-1 file:px-2 file:rounded file:border-0 file:text-md file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 ${
           props.className || ""
         }`}
       />
@@ -187,9 +187,8 @@ const AssetAddModal = ({ isOpen, onClose, onAddAsset, assetToEdit }) => {
             "Category",
             [
               ["", "-- select --"],
-              ["hardware", "Hardware"],
-              ["software", "Software"],
-              ["furniture", "Furniture"],
+              ["Electronics", "Electronics"],
+              ["Non-Electronics", "Non-Electronics"],
             ],
             { name: "category", value: formData.category }
           )}
@@ -203,7 +202,7 @@ const AssetAddModal = ({ isOpen, onClose, onAddAsset, assetToEdit }) => {
             ],
             { name: "subCategory", value: formData.subCategory }
           )}
-          {select(
+          {/* {select(
             "Supplier",
             [
               ["", "-- select --"],
@@ -212,8 +211,29 @@ const AssetAddModal = ({ isOpen, onClose, onAddAsset, assetToEdit }) => {
               ["supplier3", "Supplier 3"],
             ],
             { name: "supplier", value: formData.supplier }
-          )}
-          {select(
+          )} */}
+          {/* {select(
+            "Department",
+            [
+              ["", "-- select --"],
+              ["it", "IT Department"],
+              ["hr", "HR Department"],
+              ["finance", "Finance Department"],
+            ],
+            { name: "department", value: formData.department }
+          )} */}
+          <div className="md:col-span-2">
+            {/* {select(
+              "Sub Department",
+              [
+                ["", "Technical Support Specialist"],
+                ["network", "Network Administration"],
+                ["security", "Security Team"],
+                ["helpdesk", "Help Desk"],
+              ],
+              { name: "subDepartment", value: formData.subDepartment }
+            )} */}
+            {select(
             "Department",
             [
               ["", "-- select --"],
@@ -223,17 +243,6 @@ const AssetAddModal = ({ isOpen, onClose, onAddAsset, assetToEdit }) => {
             ],
             { name: "department", value: formData.department }
           )}
-          <div className="md:col-span-2">
-            {select(
-              "Sub Department",
-              [
-                ["", "Technical Support Specialist"],
-                ["network", "Network Administration"],
-                ["security", "Security Team"],
-                ["helpdesk", "Help Desk"],
-              ],
-              { name: "subDepartment", value: formData.subDepartment }
-            )}
           </div>
         </div>
       );
