@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, X } from 'lucide-react';
 
 const textFields = [
@@ -12,40 +12,50 @@ const textFields = [
 
 const selectFields = [
   {
-    name: 'assetStatus', label: 'Asset Status',
-    options: ['Available', 'Assigned', 'Under Maintenance', 'Disposed']
+    name: 'assetStatus',
+    label: 'Asset Status',
+    options: ['Available', 'Assigned', 'Under Maintenance', 'Disposed'],
   },
   {
-    name: 'category', label: 'Category',
-    options: ['IT', 'Furniture', 'Equipment', 'Vehicle']
+    name: 'category',
+    label: 'Category',
+    options: ['IT', 'Furniture', 'Equipment', 'Vehicle'],
   },
   {
-    name: 'subCategory', label: 'Sub Category',
-    options: ['IT', 'Hardware', 'Software', 'Accessories']
+    name: 'subCategory',
+    label: 'Sub Category',
+    options: ['IT', 'Hardware', 'Software', 'Accessories'],
   },
   {
-    name: 'supplier', label: 'Supplier',
-    options: ['Rakesh Jain', 'Supplier 2', 'Supplier 3']
+    name: 'supplier',
+    label: 'Supplier',
+    options: ['Rakesh Jain', 'Supplier 2', 'Supplier 3'],
   },
   {
-    name: 'department', label: 'Department',
-    options: ['Information Technology', 'Human Resources', 'Finance', 'Marketing']
+    name: 'department',
+    label: 'Department',
+    options: ['Information Technology', 'Human Resources', 'Finance', 'Marketing'],
   },
   {
-    name: 'subDepartment', label: 'Sub Department',
-    options: ['Procurement Specialist', 'IT Support', 'Development', 'Security']
+    name: 'subDepartment',
+    label: 'Sub Department',
+    options: ['Procurement Specialist', 'IT Support', 'Development', 'Security'],
   },
   {
-    name: 'assignEmployee', label: 'Assign Employee',
-    options: ['Radhika Gandhi', 'Rakesh Jain', 'Employee 3']
+    name: 'assignEmployee',
+    label: 'Assign Employee',
+    options: ['Radhika Gandhi', 'Rakesh Jain', 'Employee 3'],
   },
 ];
 
 const dateFields = [
   { name: 'dateOfPurchase', label: 'Date Of Purchase' },
   { name: 'dateOfManufacture', label: 'Date Of Manufacture' },
-  { name: 'warrantyInMonth', label: 'Warranty In Month' },
   { name: 'createdDate', label: 'Created Date' },
+];
+
+const numberFields = [
+  { name: 'warrantyInMonth', label: 'Warranty In Month' },
 ];
 
 const fileFields = [
@@ -54,28 +64,63 @@ const fileFields = [
 ];
 
 const initialForm = {
-  assetModelNo: '', name: '', description: '', unitPrice: '', assetStatus: 'Available',
-  dateOfPurchase: '', category: 'IT', subCategory: 'IT', supplier: 'Rakesh Jain',
-  department: 'Information Technology', subDepartment: 'Procurement Specialist',
-  dateOfManufacture: '', warrantyInMonth: '', location: '', note: '', createdDate: '',
-  assignEmployee: 'Radhika Gandhi', qrCode: null, image: null
+  assetModelNo: '',
+  name: '',
+  description: '',
+  unitPrice: '',
+  assetStatus: 'Available',
+  dateOfPurchase: '',
+  category: 'IT',
+  subCategory: 'IT',
+  supplier: 'Rakesh Jain',
+  department: 'Information Technology',
+  subDepartment: 'Procurement Specialist',
+  dateOfManufacture: '',
+  warrantyInMonth: '',
+  location: '',
+  note: '',
+  createdDate: '',
+  assignEmployee: 'Radhika Gandhi',
+  qrCode: null,
+  image: null,
 };
 
-const AddAssetForm = ({ isOpen, onClose }) => {
+const EditAssetForm = ({ isOpen, onClose, onSubmit, asset }) => {
   const [formData, setFormData] = useState(initialForm);
+
+  useEffect(() => {
+    if (asset) {
+      setFormData({
+        ...initialForm,
+        ...asset,
+        unitPrice: asset.unitPrice?.toString() || '',
+        assetStatus: asset.status || 'Available',
+        assignEmployee: asset.assignedEmployee || 'Radhika Gandhi',
+      });
+    } else {
+      setFormData(initialForm);
+    }
+  }, [asset]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleFileChange = (e, name) => {
-    setFormData(prev => ({ ...prev, [name]: e.target.files[0] }));
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setFormData((prev) => ({ ...prev, [name]: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Form Data:', formData);
+    onSubmit({ ...formData, id: asset?.id }); // Include the asset ID
     onClose();
   };
 
@@ -86,7 +131,7 @@ const AddAssetForm = ({ isOpen, onClose }) => {
       <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-screen overflow-y-auto m-4">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-800">Add Asset</h2>
+          <h2 className="text-xl font-semibold text-gray-800">Edit Asset</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
             <X className="w-6 h-6" />
           </button>
@@ -94,11 +139,11 @@ const AddAssetForm = ({ isOpen, onClose }) => {
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {textFields.map(f => (
+            {textFields.map((f) => (
               <div key={f.name}>
                 <label className="block text-sm font-medium text-gray-700 mb-2">{f.label}</label>
                 <input
-                  type={f.type || "text"}
+                  type={f.type || 'text'}
                   name={f.name}
                   value={formData[f.name]}
                   onChange={handleInputChange}
@@ -107,7 +152,7 @@ const AddAssetForm = ({ isOpen, onClose }) => {
                 />
               </div>
             ))}
-            {selectFields.map(f => (
+            {selectFields.map((f) => (
               <div key={f.name}>
                 <label className="block text-sm font-medium text-gray-700 mb-2">{f.label}</label>
                 <select
@@ -116,13 +161,15 @@ const AddAssetForm = ({ isOpen, onClose }) => {
                   onChange={handleInputChange}
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  {f.options.map(opt => (
-                    <option key={opt} value={opt}>{opt}</option>
+                  {f.options.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
                   ))}
                 </select>
               </div>
             ))}
-            {dateFields.map(f => (
+            {dateFields.map((f) => (
               <div key={f.name}>
                 <label className="block text-sm font-medium text-gray-700 mb-2">{f.label}</label>
                 <div className="relative">
@@ -137,15 +184,36 @@ const AddAssetForm = ({ isOpen, onClose }) => {
                 </div>
               </div>
             ))}
-            {fileFields.map(f => (
+            {numberFields.map((f) => (
               <div key={f.name}>
                 <label className="block text-sm font-medium text-gray-700 mb-2">{f.label}</label>
                 <input
-                  type="file"
-                  accept="image/*"
-                  onChange={e => handleFileChange(e, f.name)}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 file:mr-4 file:py-1 file:px-2 file:rounded file:border-0 file:text-sm file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  type="number"
+                  name={f.name}
+                  value={formData[f.name]}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
+              </div>
+            ))}
+            {fileFields.map((f) => (
+              <div key={f.name}>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{f.label}</label>
+                <div className="flex items-center gap-4">
+                  {formData[f.name] && (
+                    <img
+                      src={formData[f.name]}
+                      alt={f.label}
+                      className="w-12 h-12 object-cover rounded"
+                    />
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleFileChange(e, f.name)}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 file:mr-4 file:py-1 file:px-2 file:rounded file:border-0 file:text-sm file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  />
+                </div>
               </div>
             ))}
           </div>
@@ -171,4 +239,4 @@ const AddAssetForm = ({ isOpen, onClose }) => {
   );
 };
 
-export default AddAssetForm;
+export default EditAssetForm;

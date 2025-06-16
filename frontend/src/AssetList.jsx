@@ -1,17 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Edit, Trash2, Eye, X, Calendar } from "lucide-react";
+import { Edit, Trash2, Eye, Copy, Download, FileText, Printer } from "lucide-react";
 import AssetViewModal from "./AssetViewModal";
-import AddAssetForm from "./AddAssetForm"; // adjust path if in different directory
 import AssetAddModal from "./AssetAddModal";
-
-const ACTION_BTNS = [
-  { label: "Add", className: "bg-red-500 text-white hover:bg-red-600" },
-  { label: "Copy" },
-  { label: "Excel" },
-  { label: "CSV" },
-  { label: "PDF" },
-  { label: "Print" },
-];
+import EditAssetForm from "./EditAssetForm";
 
 const TABLE_HEADERS = [
   { label: "Id", sortable: true },
@@ -26,29 +17,6 @@ const TABLE_HEADERS = [
   { label: "Action" },
 ];
 
-const assets = [
-  {
-    id: 1,
-    image: "/api/placeholder/60/60",
-    assetModelNo: "Dell Inspiron 2332",
-    name: "MBA",
-    assignedEmployee: "Radhika Gandhi",
-    unitPrice: 25626,
-    dateOfPurchase: "16/02/2023",
-    status: "Available",
-  },
-  {
-    id: 2,
-    image: "/api/placeholder/60/60",
-    assetModelNo: "DELL-6526",
-    name: "DELL INSPIRON 14",
-    assignedEmployee: "Rakesh Jain",
-    unitPrice: 35600,
-    dateOfPurchase: "08/02/2023",
-    status: "Available",
-  },
-];
-
 const SortIcon = () => (
   <svg className="w-3 h-3" viewBox="0 0 12 12" fill="currentColor">
     <path d="M6 1L9 5H3L6 1ZM6 11L3 7H9L6 11Z" />
@@ -57,19 +25,74 @@ const SortIcon = () => (
 
 export default function AssetList() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalOpen1, setModalOpen1] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false); // For AssetViewModal
+  const [editModalOpen, setEditModalOpen] = useState(false); // For EditAssetForm
+  const [addModalOpen, setAddModalOpen] = useState(false); // For AssetAddModal
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [assets, setAssets] = useState([
+    {
+      id: 1,
+      image: "/api/placeholder/60/60",
+      assetModelNo: "Dell Inspiron 2332",
+      name: "MBA",
+      assignedEmployee: "Radhika Gandhi",
+      unitPrice: 25626,
+      dateOfPurchase: "2023-02-16",
+      status: "Available",
+    },
+    {
+      id: 2,
+      image: "/api/placeholder/60/60",
+      assetModelNo: "DELL-6526",
+      name: "DELL INSPIRON 14",
+      assignedEmployee: "Rakesh Jain",
+      unitPrice: 35600,
+      dateOfPurchase: "2023-02-08",
+      status: "Available",
+    },
+  ]);
   const itemsPerPage = 10;
 
-  const handleAddClick = () => {
-    setIsModalOpen(true);
+  const handleAddAsset = (newAsset) => {
+    setAssets((prevAssets) => [
+      ...prevAssets,
+      {
+        ...newAsset,
+        id: prevAssets.length + 1,
+        unitPrice: parseFloat(newAsset.unitPrice) || 0,
+        status: newAsset.status || "Available",
+        assignedEmployee: newAsset.assignEmployee || "Unassigned",
+      },
+    ]);
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
+  const handleEditAsset = (updatedAsset) => {
+    setAssets((prevAssets) =>
+      prevAssets.map((asset) =>
+        asset.id === updatedAsset.id
+          ? {
+              ...updatedAsset,
+              unitPrice: parseFloat(updatedAsset.unitPrice) || 0,
+              status: updatedAsset.assetStatus || "Available",
+              assignedEmployee: updatedAsset.assignEmployee || "Unassigned",
+            }
+          : asset
+      )
+    );
+  };
+
+  const handleAddClick = () => {
+    setAddModalOpen(true);
+  };
+
+  const handleEditClick = (asset) => {
+    setSelectedAsset(asset);
+    setEditModalOpen(true);
+  };
+
+  const handleDeleteAsset = (id) => {
+    setAssets((prevAssets) => prevAssets.filter((asset) => asset.id !== id));
   };
 
   useEffect(() => setCurrentPage(1), [searchTerm]);
@@ -95,31 +118,52 @@ export default function AssetList() {
       </div>
 
       {/* Action Buttons and Search */}
-      <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-          <div className="flex flex-wrap gap-3">
-            {ACTION_BTNS.map((btn) => (
-          <button
-            key={btn.label}
-            onClick={btn.label === "Add" ? handleAddClick : undefined}
-            className={`border border-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-50 transition-colors ${btn.className || ""}`}
-          >
-            {btn.label}
-          </button>
-        ))}
-          </div>
-          <div className="flex items-center gap-2">
-            <label htmlFor="search" className="text-gray-700">
-              Search:
-            </label>
-            <input
-              id="search"
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="border border-gray-300 rounded px-3 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Search assets..."
-            />
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+        <div className="p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={handleAddClick}
+                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium"
+              >
+                Add
+              </button>
+              <div className="flex items-center space-x-2">
+                <button className="flex items-center space-x-1 px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50">
+                  <Copy className="w-4 h-4" />
+                  <span>Copy</span>
+                </button>
+                <button className="flex items-center space-x-1 px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50">
+                  <FileText className="w-4 h-4" />
+                  <span>Excel</span>
+                </button>
+                <button className="flex items-center space-x-1 px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50">
+                  <FileText className="w-4 h-4" />
+                  <span>CSV</span>
+                </button>
+                <button className="flex items-center space-x-1 px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50">
+                  <Download className="w-4 h-4" />
+                  <span>PDF</span>
+                </button>
+                <button className="flex items-center space-x-1 px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50">
+                  <Printer className="w-4 h-4" />
+                  <span>Print</span>
+                </button>
+              </div>
+            </div>
+            <div className="flex items-center">
+              <label htmlFor="search" className="text-sm text-gray-600 mr-2">
+                Search:
+              </label>
+              <input
+                id="search"
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="border border-gray-300 rounded-md px-3 py-1 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Search assets..."
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -165,16 +209,14 @@ export default function AssetList() {
                   </td>
                   <td className="p-4">
                     <img
-                      src={asset.image}
+                      src={asset.image || "/api/placeholder/60/60"}
                       alt="Asset"
                       className="w-12 h-12 object-cover rounded"
                     />
                   </td>
                   <td className="p-4 text-gray-700">{asset.assetModelNo}</td>
                   <td className="p-4 text-gray-700">{asset.name}</td>
-                  <td className="p-4 text-gray-700">
-                    {asset.assignedEmployee}
-                  </td>
+                  <td className="p-4 text-gray-700">{asset.assignedEmployee}</td>
                   <td className="p-4 text-gray-700">
                     {asset.unitPrice.toLocaleString()}
                   </td>
@@ -195,13 +237,16 @@ export default function AssetList() {
                   </td>
                   <td className="p-4">
                     <div className="flex gap-2">
-                      <button 
-                      className="bg-gray-600 text-white p-2 rounded hover:bg-gray-700 transition-colors"
-                      onClick={() => setModalOpen1(true)}
+                      <button
+                        className="bg-gray-600 text-white p-2 rounded hover:bg-gray-700 transition-colors"
+                        onClick={() => handleEditClick(asset)}
                       >
                         <Edit className="w-4 h-4" />
                       </button>
-                      <button className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition-colors">
+                      <button
+                        className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition-colors"
+                        onClick={() => handleDeleteAsset(asset.id)}
+                      >
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -214,12 +259,10 @@ export default function AssetList() {
 
         {/* Pagination */}
         <div className="flex justify-between items-center p-4 border-t border-gray-200">
-          <div className="text-gray-600">
-            Showing {(currentPage - 1) * itemsPerPage + 1} to
-            {Math.min(
-              currentPage * itemsPerPage,
-              filteredAssets.length
-            )} of {filteredAssets.length} entries
+          <div className="text-gray-600 text-sm">
+            Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+            {Math.min(currentPage * itemsPerPage, filteredAssets.length)} of{" "}
+            {filteredAssets.length} entries
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -251,7 +294,7 @@ export default function AssetList() {
         </div>
       </div>
 
-      {/* Asset View Modal */}
+      {/* Modals */}
       <AssetViewModal
         isOpen={modalOpen}
         onClose={() => {
@@ -260,14 +303,23 @@ export default function AssetList() {
         }}
         asset={selectedAsset}
       />
-      <AddAssetForm isOpen={modalOpen1} onClose={() => setModalOpen1(false)} />
-        {/* Asset Modal */}
-      <AssetAddModal 
-        isOpen={isModalOpen} 
-        onClose={closeModal} 
+      <AssetAddModal
+        isOpen={addModalOpen}
+        onClose={() => {
+          setAddModalOpen(false);
+          setSelectedAsset(null);
+        }}
+        onAddAsset={handleAddAsset}
       />
-
-      
+      <EditAssetForm
+        isOpen={editModalOpen}
+        onClose={() => {
+          setEditModalOpen(false);
+          setSelectedAsset(null);
+        }}
+        onSubmit={handleEditAsset}
+        asset={selectedAsset}
+      />
     </div>
   );
 }

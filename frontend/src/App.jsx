@@ -4,6 +4,8 @@ import MainContent from './MainContent';
 import AssetList from './AssetList';
 import AssetSubCategories from './AssetSubCategories';
 import AssetRequestList from './AssetRequestList';
+import AssetIssueList from './AssetIssue';
+import AssetStatus from './AssetStatus';
 
 export default function App() {
   const [sidebarVisible, setSidebarVisible] = useState(true);
@@ -17,6 +19,12 @@ export default function App() {
     }
     else if (currentPage === 'asset-request') {
       return <AssetRequestList />;  
+    }
+    else if (currentPage === 'asset-issue') {
+      return <AssetIssueList />;  
+    }
+    else if (currentPage === 'asset-status') {
+      return <AssetStatus />;  
     }
     return (
       <MainContent 

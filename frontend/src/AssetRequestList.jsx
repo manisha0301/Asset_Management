@@ -27,7 +27,7 @@ export default function AssetRequestList() {
     <div className="flex-1 p-6 bg-gray-50">
       {/* Breadcrumb */}
       <div className="mb-6 flex flex-row justify-between items-center">
-        <h1 className="text-2xl font-semibold text-gray-800 mt-2">Asset Request List</h1>
+        <h1 className="text-2xl font-semibold text-gray-800">Asset Request List</h1>
         <div className="flex items-center text-sm text-gray-500">
           <span>Dashboard</span>
           <span className="mx-2">/</span>
@@ -74,7 +74,7 @@ export default function AssetRequestList() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="border border-gray-300 rounded-md px-3 py-1 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder=""
+                placeholder="Search assets..."
               />
             </div>
           </div>
@@ -87,28 +87,28 @@ export default function AssetRequestList() {
           <table className="min-w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-3 text-left font-medium text-gray-600 tracking-wider">
+                <th className="px-6 py-3 text-left font-medium text-gray-600 ">
                   Id
                 </th>
-                <th className="px-6 py-3 text-left font-medium text-gray-600 tracking-wider">
+                <th className="px-6 py-3 text-left font-medium text-gray-600 ">
                   Asset
                 </th>
-                <th className="px-6 py-3 text-left font-medium text-gray-600 tracking-wider">
+                <th className="px-6 py-3 text-left font-medium text-gray-600 ">
                   Requested Employee
                 </th>
-                <th className="px-6 py-3 text-left font-medium text-gray-600 tracking-wider">
+                <th className="px-6 py-3 text-left font-medium text-gray-600 ">
                   Approved By Employee
                 </th>
-                <th className="px-6 py-3 text-left font-medium text-gray-600 tracking-wider">
+                <th className="px-6 py-3 text-left font-medium text-gray-600 ">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left font-medium text-gray-600 tracking-wider">
+                <th className="px-6 py-3 text-left font-medium text-gray-600 ">
                   Request Date
                 </th>
-                <th className="px-6 py-3 text-left font-medium text-gray-600 tracking-wider">
+                <th className="px-6 py-3 text-left font-medium text-gray-600 ">
                   Receive Date
                 </th>
-                <th className="px-6 py-3 text-left font-medium text-gray-600 tracking-wider">
+                <th className="px-6 py-3 text-left font-medium text-gray-600 ">
                   Action
                 </th>
               </tr>
