@@ -10,9 +10,8 @@ const TABLE_HEADERS = [
   { label: "Asset Model No" },
   { label: "Name", sortable: true },
   { label: "Assigned Employee", sortable: true },
-  { label: "Unit Price" },
   { label: "Date Of Purchase" },
-  { label: "Print" },
+  { label: "Barcode" },
   { label: "Status" },
   { label: "Action" },
 ];
@@ -32,24 +31,24 @@ export default function AssetList() {
   const [currentPage, setCurrentPage] = useState(1);
   const [assets, setAssets] = useState([
     {
-      id: 1,
+      id: "1",
       image: "/api/placeholder/60/60",
       assetModelNo: "Dell Inspiron 2332",
       name: "MBA",
       assignedEmployee: "Radhika Gandhi",
-      unitPrice: 25626,
       dateOfPurchase: "2023-02-16",
       status: "Available",
+      barcodeSVG: "", // Default empty for existing assets
     },
     {
-      id: 2,
+      id: "2",
       image: "/api/placeholder/60/60",
       assetModelNo: "DELL-6526",
       name: "DELL INSPIRON 14",
       assignedEmployee: "Rakesh Jain",
-      unitPrice: 35600,
       dateOfPurchase: "2023-02-08",
       status: "Available",
+      barcodeSVG: "",
     },
   ]);
   const itemsPerPage = 10;
@@ -60,11 +59,10 @@ export default function AssetList() {
       {
         ...newAsset,
         id: prevAssets.length + 1,
-        unitPrice: parseFloat(newAsset.unitPrice) || 0,
         status: newAsset.status || "Available",
-        assignedEmployee: newAsset.assignEmployee || "Unassigned",
+        assignedEmployee: newAsset.assignedEmployee || "Unassigned",
       },
-    ]);
+      ]);
   };
 
   const handleEditAsset = (updatedAsset) => {
@@ -72,11 +70,10 @@ export default function AssetList() {
       prevAssets.map((asset) =>
         asset.id === updatedAsset.id
           ? {
-              ...updatedAsset,
-              unitPrice: parseFloat(updatedAsset.unitPrice) || 0,
-              status: updatedAsset.assetStatus || "Available",
-              assignedEmployee: updatedAsset.assignEmployee || "Unassigned",
-            }
+            ...updatedAsset,
+            status: updatedAsset.status || "Available",
+            assignedEmployee: updatedAsset.assignedEmployee || "Unassigned",
+          }
           : asset
       )
     );
@@ -113,7 +110,7 @@ export default function AssetList() {
     <div className="p-6 bg-gray-50 min-h-full">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold text-gray-800">Asset List</h1>
+        <h1 className="text-2xl font-semibold text-gray-800">Excel Asset List</h1>
         <div className="text-sm text-gray-500">Dashboard / Manage</div>
       </div>
 
@@ -128,28 +125,6 @@ export default function AssetList() {
               >
                 Add
               </button>
-              {/* <div className="flex items-center space-x-2">
-                <button className="flex items-center space-x-1 px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50">
-                  <Copy className="w-4 h-4" />
-                  <span>Copy</span>
-                </button>
-                <button className="flex items-center space-x-1 px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50">
-                  <FileText className="w-4 h-4" />
-                  <span>Excel</span>
-                </button>
-                <button className="flex items-center space-x-1 px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50">
-                  <FileText className="w-4 h-4" />
-                  <span>CSV</span>
-                </button>
-                <button className="flex items-center space-x-1 px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50">
-                  <Download className="w-4 h-4" />
-                  <span>PDF</span>
-                </button>
-                <button className="flex items-center space-x-1 px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50">
-                  <Printer className="w-4 h-4" />
-                  <span>Print</span>
-                </button>
-              </div> */}
             </div>
             <div className="flex items-center">
               <label htmlFor="search" className="text-sm text-gray-600 mr-2">
@@ -217,18 +192,18 @@ export default function AssetList() {
                   <td className="p-4 text-gray-700">{asset.assetModelNo}</td>
                   <td className="p-4 text-gray-700">{asset.name}</td>
                   <td className="p-4 text-gray-700">{asset.assignedEmployee}</td>
-                  <td className="p-4 text-gray-700">
-                    {asset.unitPrice.toLocaleString()}
-                  </td>
                   <td className="p-4 text-gray-700">{asset.dateOfPurchase}</td>
                   <td className="p-4">
-                    <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">
-                      <div className="w-12 h-12 bg-gray-300 rounded grid grid-cols-3 gap-1 p-1">
-                        {[...Array(9)].map((_, i) => (
-                          <div key={i} className="bg-gray-400 rounded-sm"></div>
-                        ))}
+                    {asset.barcodeSVG ? (
+                      <div
+                        className="w-16 h-16 flex items-center justify-center"
+                        dangerouslySetInnerHTML={{ __html: asset.barcodeSVG }}
+                      />
+                    ) : (
+                      <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">
+                        <span className="text-xs text-gray-600">No barcode</span>
                       </div>
-                    </div>
+                    )}
                   </td>
                   <td className="p-4">
                     <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">

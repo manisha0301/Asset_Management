@@ -40,12 +40,6 @@ export default function AssetViewModal({ isOpen, onClose, asset }) {
               <div className="w-2/3 p-3 text-gray-600">{asset.description || "N/A"}</div>
             </div>
 
-            {/* Unit Price */}
-            <div className="flex bg-gray-100">
-              <div className="w-1/3 p-3 font-medium text-gray-700">Unit Price</div>
-              <div className="w-2/3 p-3 text-gray-600">{asset.unitPrice.toLocaleString()}</div>
-            </div>
-
             {/* Asset Status */}
             <div className="flex">
               <div className="w-1/3 p-3 font-medium text-gray-700">Asset Status</div>

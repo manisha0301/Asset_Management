@@ -5,7 +5,7 @@ const textFields = [
   { name: 'assetModelNo', label: 'Asset Model No', placeholder: 'Dell Inspiron 2332' },
   { name: 'name', label: 'Name', placeholder: 'MBA' },
   { name: 'description', label: 'Description', placeholder: 'good' },
-  { name: 'unitPrice', label: 'Unit Price', type: 'number', placeholder: '25626' },
+  // { name: 'unitPrice', label: 'Unit Price', type: 'number', placeholder: '25626' },
   { name: 'location', label: 'Location', placeholder: 'workings' },
   { name: 'note', label: 'Note', placeholder: 'ftytyyt' },
 ];
@@ -67,7 +67,6 @@ const initialForm = {
   assetModelNo: '',
   name: '',
   description: '',
-  unitPrice: '',
   assetStatus: 'Available',
   dateOfPurchase: '',
   category: 'IT',
@@ -93,7 +92,7 @@ const EditAssetForm = ({ isOpen, onClose, onSubmit, asset }) => {
       setFormData({
         ...initialForm,
         ...asset,
-        unitPrice: asset.unitPrice?.toString() || '',
+        // unitPrice: asset.unitPrice?.toString() || '',
         assetStatus: asset.status || 'Available',
         assignEmployee: asset.assignedEmployee || 'Radhika Gandhi',
       });

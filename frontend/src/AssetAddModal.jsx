@@ -7,7 +7,6 @@ const AssetAddModal = ({ isOpen, onClose, onAddAsset, assetToEdit }) => {
     assetModelNo: "",
     name: "",
     description: "",
-    unitPrice: "",
     status: "",
     dateOfPurchase: "",
     category: "",
@@ -23,25 +22,41 @@ const AssetAddModal = ({ isOpen, onClose, onAddAsset, assetToEdit }) => {
     note: "",
     createdDate: "",
     assignedEmployee: "",
+    barcodeSVG: "", // New field to store barcode SVG
   });
+  const [isJsBarcodeLoaded, setIsJsBarcodeLoaded] = useState(false);
 
+  // Load JsBarcode and set flag
+  useEffect(() => {
+    if (window.JsBarcode) {
+      setIsJsBarcodeLoaded(true);
+    } else {
+      const script = document.createElement("script");
+      script.src = "https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js";
+      script.async = true;
+      script.onload = () => setIsJsBarcodeLoaded(true);
+      script.onerror = () => console.error("Failed to load JsBarcode");
+      document.body.appendChild(script);
+      return () => {
+        document.body.removeChild(script);
+      };
+    }
+  }, []);
+
+  // Handle form data initialization
   useEffect(() => {
     if (isOpen) {
       if (assetToEdit) {
-        // Pre-populate form with assetToEdit data
         setFormData({
           ...formData,
           ...assetToEdit,
-          unitPrice: assetToEdit.unitPrice?.toString() || "", // Convert number to string for input
         });
       } else {
-        // Reset form for adding new asset
         setActiveTab("Basic Info");
         setFormData({
           assetModelNo: "",
           name: "",
           description: "",
-          unitPrice: "",
           status: "",
           dateOfPurchase: "",
           category: "",
@@ -57,10 +72,46 @@ const AssetAddModal = ({ isOpen, onClose, onAddAsset, assetToEdit }) => {
           note: "",
           createdDate: "",
           assignedEmployee: "",
+          barcodeSVG: "",
         });
       }
     }
   }, [isOpen, assetToEdit]);
+
+  // Generate barcode when assetModelNo changes
+  useEffect(() => {
+    const barcodeElement = document.getElementById("barcode");
+    if (barcodeElement) {
+      barcodeElement.innerHTML = ""; // Clear previous barcode
+    }
+
+    if (isJsBarcodeLoaded && formData.assetModelNo && barcodeElement) {
+      try {
+        window.JsBarcode("#barcode", formData.assetModelNo, {
+          format: "CODE128",
+          displayValue: true,
+          fontSize: 14,
+          height: 60,
+          width: 2,
+          textMargin: 2,
+          margin: 10,
+          background: "#ffffff",
+          lineColor: "#000000",
+        });
+        // Capture the SVG content
+        const svgContent = barcodeElement.outerHTML;
+        setFormData((prev) => ({ ...prev, barcodeSVG: svgContent }));
+      } catch (error) {
+        console.error("Barcode generation failed:", error);
+        if (barcodeElement) {
+          barcodeElement.innerHTML = `<text x="10" y="30" font-size="14" fill="#000">Invalid model number</text>`;
+        }
+        setFormData((prev) => ({ ...prev, barcodeSVG: "" }));
+      }
+    } else {
+      setFormData((prev) => ({ ...prev, barcodeSVG: "" }));
+    }
+  }, [formData.assetModelNo, isJsBarcodeLoaded]);
 
   const tabs = ["Basic Info", "Other Info", "Asset Assign"];
 
@@ -90,11 +141,10 @@ const AssetAddModal = ({ isOpen, onClose, onAddAsset, assetToEdit }) => {
     } else if (activeTab === "Asset Assign") {
       const updatedAsset = {
         ...formData,
-        unitPrice: parseFloat(formData.unitPrice) || 0,
         status: formData.status || "Available",
         assignedEmployee: formData.assignedEmployee || "Unassigned",
       };
-      onAddAsset(updatedAsset); // This will handle both add and edit
+      onAddAsset(updatedAsset);
       onClose();
     }
   };
@@ -156,25 +206,21 @@ const AssetAddModal = ({ isOpen, onClose, onAddAsset, assetToEdit }) => {
             type: "text",
             name: "assetModelNo",
             value: formData.assetModelNo,
+            placeholder: "e.g., XPS-13-9300",
           })}
           {input("Name", { type: "text", name: "name", value: formData.name })}
           {textarea("Description", {
-            rows: 3,
+            rows: 1,
             name: "description",
             value: formData.description,
-          })}
-          {input("Unit Price", {
-            type: "number",
-            name: "unitPrice",
-            value: formData.unitPrice,
           })}
           {select(
             "Asset Status",
             [
               ["", "- select -"],
-              ["active", "Active"],
-              ["inactive", "Inactive"],
-              ["maintenance", "Under Maintenance"],
+              ["Active", "Active"],
+              ["Inactive", "Inactive"],
+              ["Under Maintenance", "Under Maintenance"],
             ],
             { name: "status", value: formData.status }
           )}
@@ -196,53 +242,39 @@ const AssetAddModal = ({ isOpen, onClose, onAddAsset, assetToEdit }) => {
             "Sub Category",
             [
               ["", "-- select --"],
-              ["laptop", "Laptop"],
-              ["desktop", "Desktop"],
-              ["monitor", "Monitor"],
+              ["Laptop", "Laptop"],
+              ["Desktop", "Desktop"],
+              ["Monitor", "Monitor"],
             ],
             { name: "subCategory", value: formData.subCategory }
           )}
-          {/* {select(
-            "Supplier",
-            [
-              ["", "-- select --"],
-              ["supplier1", "Supplier 1"],
-              ["supplier2", "Supplier 2"],
-              ["supplier3", "Supplier 3"],
-            ],
-            { name: "supplier", value: formData.supplier }
-          )} */}
-          {/* {select(
+          {select(
             "Department",
             [
               ["", "-- select --"],
-              ["it", "IT Department"],
-              ["hr", "HR Department"],
-              ["finance", "Finance Department"],
-            ],
-            { name: "department", value: formData.department }
-          )} */}
-          <div className="md:col-span-2">
-            {/* {select(
-              "Sub Department",
-              [
-                ["", "Technical Support Specialist"],
-                ["network", "Network Administration"],
-                ["security", "Security Team"],
-                ["helpdesk", "Help Desk"],
-              ],
-              { name: "subDepartment", value: formData.subDepartment }
-            )} */}
-            {select(
-            "Department",
-            [
-              ["", "-- select --"],
-              ["it", "IT Department"],
-              ["hr", "HR Department"],
-              ["finance", "Finance Department"],
+              ["IT Department", "IT Department"],
+              ["HR Department", "HR Department"],
+              ["Finance Department", "Finance Department"],
             ],
             { name: "department", value: formData.department }
           )}
+          {input("Image", { type: "file", name: "image", accept: "image/*" })}
+          <div className="flex flex-col items-center">
+            {isJsBarcodeLoaded && formData.assetModelNo ? (
+              <svg
+                id="barcode"
+                className="w-full h-28"
+                style={{ display: "block" }}
+              ></svg>
+            ) : (
+              <div className="w-full h-28 flex items-center justify-center border border-gray-300 rounded">
+                <span className="text-xs text-gray-600">
+                  {isJsBarcodeLoaded
+                    ? "Enter model number to generate barcode"
+                    : "Loading barcode generator..."}
+                </span>
+              </div>
+            )}
           </div>
         </div>
       );
@@ -270,15 +302,12 @@ const AssetAddModal = ({ isOpen, onClose, onAddAsset, assetToEdit }) => {
             name: "location",
             value: formData.location,
           })}
-          {input("Image", { type: "file", name: "image", accept: "image/*" })}
-          {textarea("Note", { rows: 3, name: "note", value: formData.note })}
-          <div className="md:col-span-2">
-            {input("Created Date", {
-              type: "date",
-              name: "createdDate",
-              value: formData.createdDate,
-            })}
-          </div>
+          {textarea("Note", { rows: 2, name: "note", value: formData.note })}
+          {input("Created Date", {
+            type: "date",
+            name: "createdDate",
+            value: formData.createdDate,
+          })}
         </div>
       );
     }
@@ -331,7 +360,7 @@ const AssetAddModal = ({ isOpen, onClose, onAddAsset, assetToEdit }) => {
         </div>
         <div className="p-6">
           {renderTabContent()}
-          <div className="flex justify-start gap-3 mt-8 pt-6">
+          <div className="flex justify-start gap-3 pt-6">
             <button
               onClick={handleSave}
               className="bg-gray-600 text-white px-6 py-2 rounded hover:bg-gray-700 transition-colors"
