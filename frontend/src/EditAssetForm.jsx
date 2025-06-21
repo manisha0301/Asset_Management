@@ -5,7 +5,6 @@ const textFields = [
   { name: 'assetModelNo', label: 'Asset Model No', placeholder: 'Dell Inspiron 2332' },
   { name: 'name', label: 'Name', placeholder: 'MBA' },
   { name: 'description', label: 'Description', placeholder: 'good' },
-  // { name: 'unitPrice', label: 'Unit Price', type: 'number', placeholder: '25626' },
   { name: 'location', label: 'Location', placeholder: 'workings' },
   { name: 'note', label: 'Note', placeholder: 'ftytyyt' },
 ];
@@ -59,7 +58,6 @@ const numberFields = [
 ];
 
 const fileFields = [
-  { name: 'qrCode', label: 'QR Code' },
   { name: 'image', label: 'Image' },
 ];
 
@@ -80,26 +78,80 @@ const initialForm = {
   note: '',
   createdDate: '',
   assignEmployee: 'Radhika Gandhi',
-  qrCode: null,
   image: null,
+  barcodeSVG: '',
 };
 
 const EditAssetForm = ({ isOpen, onClose, onSubmit, asset }) => {
   const [formData, setFormData] = useState(initialForm);
+  const [isJsBarcodeLoaded, setIsJsBarcodeLoaded] = useState(false);
 
+  // Load JsBarcode
+  useEffect(() => {
+    if (window.JsBarcode) {
+      setIsJsBarcodeLoaded(true);
+    } else {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js';
+      script.async = true;
+      script.onload = () => setIsJsBarcodeLoaded(true);
+      script.onerror = () => console.error('Failed to load JsBarcode');
+      document.body.appendChild(script);
+      return () => {
+        document.body.removeChild(script);
+      };
+    }
+  }, []);
+
+  // Initialize form data
   useEffect(() => {
     if (asset) {
       setFormData({
         ...initialForm,
         ...asset,
-        // unitPrice: asset.unitPrice?.toString() || '',
         assetStatus: asset.status || 'Available',
         assignEmployee: asset.assignedEmployee || 'Radhika Gandhi',
+        barcodeSVG: asset.barcodeSVG || '',
       });
     } else {
       setFormData(initialForm);
     }
   }, [asset]);
+
+  // Generate barcode when assetModelNo changes
+  useEffect(() => {
+    const barcodeElement = document.getElementById('barcode');
+    if (barcodeElement) {
+      barcodeElement.innerHTML = ''; // Clear previous barcode
+    }
+
+    if (isJsBarcodeLoaded && formData.assetModelNo && barcodeElement) {
+      try {
+        window.JsBarcode('#barcode', formData.assetModelNo, {
+          format: 'CODE128',
+          displayValue: true,
+          fontSize: 14,
+          height: 60,
+          width: 2,
+          textMargin: 2,
+          margin: 10,
+          background: '#ffffff',
+          lineColor: '#000000',
+        });
+        // Capture the SVG content
+        const svgContent = barcodeElement.outerHTML;
+        setFormData((prev) => ({ ...prev, barcodeSVG: svgContent }));
+      } catch (error) {
+        console.error('Barcode generation failed:', error);
+        if (barcodeElement) {
+          barcodeElement.innerHTML = `<text x="10" y="30" font-size="14" fill="#000">Invalid model number</text>`;
+        }
+        setFormData((prev) => ({ ...prev, barcodeSVG: '' }));
+      }
+    } else {
+      setFormData((prev) => ({ ...prev, barcodeSVG: '' }));
+    }
+  }, [formData.assetModelNo, isJsBarcodeLoaded]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -215,6 +267,26 @@ const EditAssetForm = ({ isOpen, onClose, onSubmit, asset }) => {
                 </div>
               </div>
             ))}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Barcode</label>
+              <div className="flex items-center gap-4">
+                {isJsBarcodeLoaded && formData.assetModelNo ? (
+                  <svg
+                    id="barcode"
+                    className="w-60 h-16"
+                    style={{ display: 'block' }}
+                  ></svg>
+                ) : (
+                  <div className="flex items-center justify-center border border-gray-300 rounded">
+                    <span className="text-xs text-gray-600">
+                      {isJsBarcodeLoaded
+                        ? 'Enter model number to generate barcode'
+                        : 'Loading barcode generator...'}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
           {/* Action Buttons */}
           <div className="flex items-center justify-end space-x-4 mt-8 pt-6 border-t border-gray-200">

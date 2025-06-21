@@ -3,6 +3,7 @@ import { Edit, Trash2, Eye, Copy, Download, FileText, Printer } from "lucide-rea
 import AssetViewModal from "./AssetViewModal";
 import AssetAddModal from "./AssetAddModal";
 import EditAssetForm from "./EditAssetForm";
+import BarcodeModal from "./BarcodeModal";
 
 const TABLE_HEADERS = [
   { label: "Id", sortable: true },
@@ -27,7 +28,9 @@ export default function AssetList() {
   const [modalOpen, setModalOpen] = useState(false); // For AssetViewModal
   const [editModalOpen, setEditModalOpen] = useState(false); // For EditAssetForm
   const [addModalOpen, setAddModalOpen] = useState(false); // For AssetAddModal
+  const [barcodeModalOpen, setBarcodeModalOpen] = useState(false); // For BarcodeModal
   const [selectedAsset, setSelectedAsset] = useState(null);
+  const [selectedBarcodeSVG, setSelectedBarcodeSVG] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [assets, setAssets] = useState([
     {
@@ -38,7 +41,7 @@ export default function AssetList() {
       assignedEmployee: "Radhika Gandhi",
       dateOfPurchase: "2023-02-16",
       status: "Available",
-      barcodeSVG: "", // Default empty for existing assets
+      barcodeSVG: "",
     },
     {
       id: "2",
@@ -62,7 +65,7 @@ export default function AssetList() {
         status: newAsset.status || "Available",
         assignedEmployee: newAsset.assignedEmployee || "Unassigned",
       },
-      ]);
+    ]);
   };
 
   const handleEditAsset = (updatedAsset) => {
@@ -70,10 +73,10 @@ export default function AssetList() {
       prevAssets.map((asset) =>
         asset.id === updatedAsset.id
           ? {
-            ...updatedAsset,
-            status: updatedAsset.status || "Available",
-            assignedEmployee: updatedAsset.assignedEmployee || "Unassigned",
-          }
+              ...updatedAsset,
+              status: updatedAsset.status || "Available",
+              assignedEmployee: updatedAsset.assignedEmployee || "Unassigned",
+            }
           : asset
       )
     );
@@ -90,6 +93,13 @@ export default function AssetList() {
 
   const handleDeleteAsset = (id) => {
     setAssets((prevAssets) => prevAssets.filter((asset) => asset.id !== id));
+  };
+
+  const handleBarcodeClick = (barcodeSVG) => {
+    if (barcodeSVG) {
+      setSelectedBarcodeSVG(barcodeSVG);
+      setBarcodeModalOpen(true);
+    }
   };
 
   useEffect(() => setCurrentPage(1), [searchTerm]);
@@ -110,7 +120,7 @@ export default function AssetList() {
     <div className="p-6 bg-gray-50 min-h-full">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold text-gray-800">Excel Asset List</h1>
+        <h1 className="text-2xl font-semibold text-gray-800">Asset List</h1>
         <div className="text-sm text-gray-500">Dashboard / Manage</div>
       </div>
 
@@ -196,8 +206,9 @@ export default function AssetList() {
                   <td className="p-4">
                     {asset.barcodeSVG ? (
                       <div
-                        className="w-16 h-16 flex items-center justify-center"
+                        className="w-16 h-16 flex items-center justify-center cursor-pointer"
                         dangerouslySetInnerHTML={{ __html: asset.barcodeSVG }}
+                        onClick={() => handleBarcodeClick(asset.barcodeSVG)}
                       />
                     ) : (
                       <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">
@@ -294,6 +305,14 @@ export default function AssetList() {
         }}
         onSubmit={handleEditAsset}
         asset={selectedAsset}
+      />
+      <BarcodeModal
+        isOpen={barcodeModalOpen}
+        onClose={() => {
+          setBarcodeModalOpen(false);
+          setSelectedBarcodeSVG(null);
+        }}
+        barcodeSVG={selectedBarcodeSVG}
       />
     </div>
   );
